@@ -65,14 +65,14 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          format: markdown
+          format: html
           message: |
-            *EasyEnglish Admin Panel*
+            <b>EasyEnglish Admin Panel</b>
 
             ${{ needs.build.result == 'success' && needs.deploy.result == 'success' && '✅ Deploy muvaffaqiyatli!' || '❌ Deploy muvaffaqiyatsiz!' }}
 
-            📦 *Commit:* `${{ github.sha }}`
-            👤 *Author:* ${{ github.actor }}
-            💬 *Message:* ${{ github.event.head_commit.message }}
+            📦 <b>Commit:</b> <code>${{ github.sha }}</code>
+            👤 <b>Author:</b> ${{ github.actor }}
+            💬 <b>Message:</b> ${{ github.event.head_commit.message }}
 
-            [🔗 GitHub Actions](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">🔗 GitHub Actions</a>
