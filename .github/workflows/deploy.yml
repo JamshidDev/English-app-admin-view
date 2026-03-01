@@ -62,12 +62,16 @@ jobs:
     steps:
       - name: Sanitize commit message
         id: sanitize
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
-          MSG="${{ github.event.head_commit.message }}"
-          MSG="${MSG//&/&amp;}"
-          MSG="${MSG//</&lt;}"
-          MSG="${MSG//>/&gt;}"
-          echo "message=$MSG" >> $GITHUB_OUTPUT
+          # Take only first line of commit message
+          FIRST_LINE=$(echo "$COMMIT_MSG" | head -n 1)
+          # Escape HTML entities
+          FIRST_LINE="${FIRST_LINE//&/&amp;}"
+          FIRST_LINE="${FIRST_LINE//</&lt;}"
+          FIRST_LINE="${FIRST_LINE//>/&gt;}"
+          echo "message=$FIRST_LINE" >> $GITHUB_OUTPUT
 
       - name: Send Telegram notification
         uses: appleboy/telegram-action@master
