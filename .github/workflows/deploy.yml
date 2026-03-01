@@ -60,6 +60,15 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
+      - name: Sanitize commit message
+        id: sanitize
+        run: |
+          MSG="${{ github.event.head_commit.message }}"
+          MSG="${MSG//&/&amp;}"
+          MSG="${MSG//</&lt;}"
+          MSG="${MSG//>/&gt;}"
+          echo "message=$MSG" >> $GITHUB_OUTPUT
+
       - name: Send Telegram notification
         uses: appleboy/telegram-action@master
         with:
@@ -73,6 +82,6 @@ jobs:
 
             📦 <b>Commit:</b> <code>${{ github.sha }}</code>
             👤 <b>Author:</b> ${{ github.actor }}
-            💬 <b>Message:</b> ${{ github.event.head_commit.message }}
+            💬 <b>Message:</b> ${{ steps.sanitize.outputs.message }}
 
             <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">🔗 GitHub Actions</a>
