@@ -120,7 +120,9 @@ async function moveItem(index: number, direction: 'up' | 'down') {
   const items = [...clientCategories.value]
   const swapIndex = direction === 'up' ? index - 1 : index + 1
   if (swapIndex < 0 || swapIndex >= items.length) return
-  ;[items[index], items[swapIndex]] = [items[swapIndex], items[index]]
+  const temp = items[index]!
+  items[index] = items[swapIndex]!
+  items[swapIndex] = temp
   clientCategories.value = items
 
   try {
