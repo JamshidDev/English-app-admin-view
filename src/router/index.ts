@@ -43,6 +43,11 @@ const routes: RouteRecordRaw[] = [
         name: 'client-category',
         component: () => import('@/pages/client-category/page.vue'),
       },
+      {
+        path: 'reports',
+        name: 'reports',
+        component: () => import('@/pages/reports/page.vue'),
+      },
     ],
   },
 ]

@@ -3,6 +3,7 @@ import {
   BookOpen,
   Users,
   Settings,
+  MessageSquareWarning,
 } from 'lucide-vue-next'
 import type { Component } from 'vue'
 
@@ -40,6 +41,11 @@ export const navigation: NavItem[] = [
       { title: 'Mijozlar', path: '/client' },
       { title: 'Kategoriyalar', path: '/client-category' },
     ],
+  },
+  {
+    title: 'Xatoliklar',
+    icon: MessageSquareWarning,
+    path: '/reports',
   },
   {
     title: 'Sozlamalar',
