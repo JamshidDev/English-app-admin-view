@@ -3,19 +3,18 @@ import type { Client } from '@/api/client'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableEmpty,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableEmpty,
 } from '@/components/ui/table'
-import { Pencil, Trash2 } from 'lucide-vue-next'
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { MoreHorizontal, Pencil, Trash2, Loader2 } from 'lucide-vue-next'
 
-defineProps<{
+const props = defineProps<{
   data: Client[]
   loading?: boolean
+  page?: number
+  pageSize?: number
 }>()
 
 defineEmits<{
@@ -26,9 +25,15 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="rounded-md border">
+  <div class="rounded-md border relative h-[calc(100vh-280px)] overflow-auto">
+    <div v-if="loading" class="absolute inset-0 bg-background/60 backdrop-blur-[1px] z-20 flex items-center justify-center rounded-md">
+      <div class="flex items-center gap-2 text-muted-foreground">
+        <Loader2 class="size-5 animate-spin text-primary" />
+        <span class="text-sm">Yuklanmoqda...</span>
+      </div>
+    </div>
     <Table>
-      <TableHeader>
+      <TableHeader class="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900 shadow-[0_1px_0_0_hsl(var(--border))]">
         <TableRow>
           <TableHead class="w-12">#</TableHead>
           <TableHead>Ism</TableHead>
@@ -36,45 +41,40 @@ defineEmits<{
           <TableHead>Telegram ID</TableHead>
           <TableHead>Telefon</TableHead>
           <TableHead class="w-24">Bloklangan</TableHead>
-          <TableHead class="w-24 text-right">Amallar</TableHead>
+          <TableHead class="w-16 text-right">Amallar</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        <template v-if="loading">
-          <TableRow>
-            <TableCell colspan="7" class="h-24 text-center text-muted-foreground">
-              Yuklanmoqda...
-            </TableCell>
-          </TableRow>
-        </template>
-        <template v-else-if="data.length">
+        <template v-if="data.length">
           <TableRow v-for="(item, index) in data" :key="item.id">
-            <TableCell class="font-medium">{{ index + 1 }}</TableCell>
+            <TableCell class="font-medium">{{ ((props.page || 1) - 1) * (props.pageSize || 10) + index + 1 }}</TableCell>
             <TableCell class="font-medium">{{ item.firstName }}</TableCell>
             <TableCell class="text-muted-foreground">{{ item.lastName || '—' }}</TableCell>
             <TableCell class="font-mono text-sm">{{ item.telegramId }}</TableCell>
             <TableCell class="text-muted-foreground">{{ item.phone || '—' }}</TableCell>
             <TableCell>
-              <Switch
-                :model-value="!!item.blockedAt"
-                @update:model-value="$emit('toggleBlock', item.id)"
-              />
+              <Switch :model-value="!!item.blockedAt" @update:model-value="$emit('toggleBlock', item.id)" />
             </TableCell>
             <TableCell class="text-right">
-              <div class="flex justify-end gap-1">
-                <Button variant="ghost" size="icon" @click="$emit('edit', item)">
-                  <Pencil class="size-4" />
-                </Button>
-                <Button variant="ghost" size="icon" @click="$emit('delete', item.id)">
-                  <Trash2 class="size-4 text-destructive" />
-                </Button>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger as-child>
+                  <Button variant="ghost" size="icon" class="size-8">
+                    <MoreHorizontal class="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem @click="$emit('edit', item)">
+                    <Pencil class="size-4 mr-2" /> Tahrirlash
+                  </DropdownMenuItem>
+                  <DropdownMenuItem class="text-destructive" @click="$emit('delete', item.id)">
+                    <Trash2 class="size-4 mr-2" /> O'chirish
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </TableCell>
           </TableRow>
         </template>
-        <TableEmpty v-else :colspan="7">
-          Ma'lumot topilmadi
-        </TableEmpty>
+        <TableEmpty v-else :colspan="7">Ma'lumot topilmadi</TableEmpty>
       </TableBody>
     </Table>
   </div>

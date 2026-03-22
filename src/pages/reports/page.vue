@@ -119,7 +119,7 @@ async function handleSkip() {
       </Select>
     </div>
 
-    <DataTable :data="reports" :loading="loading" @open="openReport" />
+    <DataTable :data="reports" :loading="loading" :page="currentPage" :page-size="Number(pageSize)" @open="openReport" />
     <CursorPagination :meta="meta" :loading="loading" v-model:page-size="pageSize" @change="goToPage" />
 
     <FixForm

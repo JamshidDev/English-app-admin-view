@@ -9,6 +9,7 @@ export interface Word {
   transcription: string | null
   example: string | null
   exampleTranslate: TranslatedField | null
+  audioUrl: string | null
   createdAt: string
   updatedAt: string
   deletedAt: string | null
@@ -54,5 +55,13 @@ export const wordApi = {
 
   delete(id: string) {
     return http.delete<ApiResponse<null>>(`/words/${id}`)
+  },
+
+  generateAudio(collectionId: string) {
+    return http.post<ApiResponse<{ total: number; generated: number; skipped: number; errors?: string[] }>>('/words/generate-audio', { collectionId })
+  },
+
+  generateSingleAudio(wordId: string) {
+    return http.post<ApiResponse<Word>>(`/words/${wordId}/generate-audio`)
   },
 }

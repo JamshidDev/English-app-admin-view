@@ -6,13 +6,7 @@ import type { PaginationMeta } from '@/api/types'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import CursorPagination from '@/components/shared/CursorPagination.vue'
 import DeleteDialog from '@/components/shared/DeleteDialog.vue'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import SearchableSelect from '@/components/shared/SearchableSelect.vue'
 import DataTable from './ui/DataTable.vue'
 import WordForm from './ui/WordForm.vue'
 
@@ -105,21 +99,16 @@ async function handleDelete() {
   <div class="space-y-4">
     <PageHeader title="So'zlar" create-label="Yangi so'z" v-model:search="search" @create="openCreate">
       <template #filters>
-        <Select v-model="collectionFilter">
-          <SelectTrigger class="w-48">
-            <SelectValue placeholder="To'plam" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Barcha to'plamlar</SelectItem>
-            <SelectItem v-for="col in collections" :key="col.id" :value="col.id">
-              {{ col.name.uz }}
-            </SelectItem>
-          </SelectContent>
-        </Select>
+        <SearchableSelect
+          v-model="collectionFilter"
+          :options="collections.map(c => ({ value: c.id, label: c.name.uz }))"
+          placeholder="To'plam"
+          all-label="Barcha to'plamlar"
+        />
       </template>
     </PageHeader>
 
-    <DataTable :data="words" :loading="loading" @edit="openEdit" @delete="openDelete" />
+    <DataTable :data="words" :loading="loading" :page="currentPage" :page-size="Number(pageSize)" @edit="openEdit" @delete="openDelete" />
     <CursorPagination :meta="meta" :loading="loading" v-model:page-size="pageSize" @change="goToPage" />
     <WordForm :open="formOpen" :word="editingWord" :loading="formLoading" @update:open="formOpen = $event" @submit="handleSubmit" />
     <DeleteDialog v-model:open="deleteOpen" :loading="deleteLoading" @confirm="handleDelete" />
