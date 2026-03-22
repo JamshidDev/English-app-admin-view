@@ -6,6 +6,7 @@ export interface Collection {
   categoryId: string
   name: TranslatedField
   public: boolean
+  isNew: boolean
   wordCount: number
   createdAt: string
   updatedAt: string
@@ -19,6 +20,7 @@ export interface CreateCollectionDto {
 }
 
 export interface UpdateCollectionDto {
+  categoryId?: string
   name?: TranslatedField
   public?: boolean
 }
@@ -51,5 +53,9 @@ export const collectionApi = {
 
   togglePublic(id: string) {
     return http.patch<ApiResponse<Collection>>(`/collections/${id}/toggle-public`)
+  },
+
+  toggleNew(id: string) {
+    return http.patch<ApiResponse<Collection>>(`/collections/${id}/toggle-new`)
   },
 }

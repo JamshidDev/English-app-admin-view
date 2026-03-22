@@ -93,7 +93,7 @@ async function handleToggleBlock(id: string) {
 <template>
   <div class="space-y-4">
     <PageHeader title="Mijozlar" create-label="Yangi mijoz" v-model:search="search" @create="openCreate" />
-    <DataTable :data="clients" :loading="loading" @edit="openEdit" @delete="openDelete" @toggle-block="handleToggleBlock" />
+    <DataTable :data="clients" :loading="loading" :page="currentPage" :page-size="Number(pageSize)" @edit="openEdit" @delete="openDelete" @toggle-block="handleToggleBlock" />
     <CursorPagination :meta="meta" :loading="loading" v-model:page-size="pageSize" @change="goToPage" />
     <ClientForm :open="formOpen" :client="editingClient" :loading="formLoading" @update:open="formOpen = $event" @submit="handleSubmit" />
     <DeleteDialog v-model:open="deleteOpen" :loading="deleteLoading" @confirm="handleDelete" />

@@ -56,7 +56,7 @@ const visiblePages = computed(() => {
     <div class="flex items-center gap-2">
       <p class="text-sm text-muted-foreground whitespace-nowrap">Satrlar:</p>
       <Select v-model="pageSize">
-        <SelectTrigger class="h-8 w-[70px]">
+        <SelectTrigger class="h-8 w-[80px]">
           <SelectValue />
         </SelectTrigger>
         <SelectContent side="top">

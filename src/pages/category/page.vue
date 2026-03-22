@@ -92,7 +92,7 @@ async function handleTogglePublic(id: string) {
 <template>
   <div class="space-y-4">
     <PageHeader title="Kategoriyalar" v-model:search="search" @create="openCreate" />
-    <DataTable :data="categories" :loading="loading" @edit="openEdit" @delete="openDelete" @toggle-public="handleTogglePublic" />
+    <DataTable :data="categories" :loading="loading" :page="currentPage" :page-size="Number(pageSize)" @edit="openEdit" @delete="openDelete" @toggle-public="handleTogglePublic" />
     <CursorPagination :meta="meta" :loading="loading" v-model:page-size="pageSize" @change="goToPage" />
     <CategoryForm :open="formOpen" :category="editingCategory" :loading="formLoading" @update:open="formOpen = $event" @submit="handleSubmit" />
     <DeleteDialog v-model:open="deleteOpen" :loading="deleteLoading" @confirm="handleDelete" />

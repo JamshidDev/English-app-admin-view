@@ -2,19 +2,18 @@
 import type { Report } from '@/api/reports'
 import { Button } from '@/components/ui/button'
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableEmpty,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableEmpty,
 } from '@/components/ui/table'
-import { Eye } from 'lucide-vue-next'
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { MoreHorizontal, Eye, Loader2 } from 'lucide-vue-next'
 
-defineProps<{
+const props = defineProps<{
   data: Report[]
   loading?: boolean
+  page?: number
+  pageSize?: number
 }>()
 
 defineEmits<{
@@ -41,9 +40,15 @@ function statusLabel(status: string) {
 </script>
 
 <template>
-  <div class="rounded-md border">
+  <div class="rounded-md border relative h-[calc(100vh-280px)] overflow-auto">
+    <div v-if="loading" class="absolute inset-0 bg-background/60 backdrop-blur-[1px] z-20 flex items-center justify-center rounded-md">
+      <div class="flex items-center gap-2 text-muted-foreground">
+        <Loader2 class="size-5 animate-spin text-primary" />
+        <span class="text-sm">Yuklanmoqda...</span>
+      </div>
+    </div>
     <Table>
-      <TableHeader>
+      <TableHeader class="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900 shadow-[0_1px_0_0_hsl(var(--border))]">
         <TableRow>
           <TableHead class="w-12">#</TableHead>
           <TableHead>Foydalanuvchi</TableHead>
@@ -51,25 +56,18 @@ function statusLabel(status: string) {
           <TableHead>Xabar</TableHead>
           <TableHead>Holat</TableHead>
           <TableHead>Sana</TableHead>
-          <TableHead class="w-20 text-right">Amal</TableHead>
+          <TableHead class="w-16 text-right">Amal</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        <template v-if="loading">
-          <TableRow>
-            <TableCell colspan="7" class="h-24 text-center text-muted-foreground">
-              Yuklanmoqda...
-            </TableCell>
-          </TableRow>
-        </template>
-        <template v-else-if="data.length">
+        <template v-if="data.length">
           <TableRow
             v-for="(item, index) in data"
             :key="item.id"
             class="cursor-pointer hover:bg-muted/50"
             @click="$emit('open', item)"
           >
-            <TableCell class="font-medium">{{ index + 1 }}</TableCell>
+            <TableCell class="font-medium">{{ ((props.page || 1) - 1) * (props.pageSize || 10) + index + 1 }}</TableCell>
             <TableCell>
               <div class="font-medium text-sm">{{ item.clientName }}</div>
             </TableCell>
@@ -82,15 +80,22 @@ function statusLabel(status: string) {
             </TableCell>
             <TableCell class="text-muted-foreground text-xs">{{ formatDate(item.createdAt) }}</TableCell>
             <TableCell class="text-right">
-              <Button variant="ghost" size="icon" @click.stop="$emit('open', item)">
-                <Eye class="size-4" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger as-child>
+                  <Button variant="ghost" size="icon" class="size-8" @click.stop>
+                    <MoreHorizontal class="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem @click.stop="$emit('open', item)">
+                    <Eye class="size-4 mr-2" /> Ko'rish
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </TableCell>
           </TableRow>
         </template>
-        <TableEmpty v-else :colspan="7">
-          Xatolik xabarlari topilmadi
-        </TableEmpty>
+        <TableEmpty v-else :colspan="7">Xatolik xabarlari topilmadi</TableEmpty>
       </TableBody>
     </Table>
   </div>

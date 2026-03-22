@@ -7,15 +7,10 @@ import type { PaginationMeta, TranslatedField } from '@/api/types'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import CursorPagination from '@/components/shared/CursorPagination.vue'
 import DeleteDialog from '@/components/shared/DeleteDialog.vue'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import SearchableSelect from '@/components/shared/SearchableSelect.vue'
 import DataTable from './ui/DataTable.vue'
 import CollectionForm from './ui/CollectionForm.vue'
+import AudioModal from './ui/AudioModal.vue'
 
 const route = useRoute()
 
@@ -81,7 +76,7 @@ async function handleSubmit(formData: { categoryId: string; name: TranslatedFiel
   formLoading.value = true
   try {
     if (editingCollection.value) {
-      await collectionApi.update(editingCollection.value.id, { name: formData.name })
+      await collectionApi.update(editingCollection.value.id, { name: formData.name, categoryId: formData.categoryId })
     } else {
       await collectionApi.create(formData)
     }
@@ -112,29 +107,43 @@ async function handleTogglePublic(id: string) {
     fetchCollections()
   } catch { /* ignore */ }
 }
+
+async function handleToggleNew(id: string) {
+  try {
+    await collectionApi.toggleNew(id)
+    fetchCollections()
+  } catch { /* ignore */ }
+}
+
+const audioModalOpen = ref(false)
+const audioCollectionId = ref<string | null>(null)
+const audioCollectionName = ref('')
+
+function handleOpenAudioModal(collectionId: string) {
+  const col = collections.value.find(c => c.id === collectionId)
+  audioCollectionId.value = collectionId
+  audioCollectionName.value = col?.name?.uz || ''
+  audioModalOpen.value = true
+}
 </script>
 
 <template>
   <div class="space-y-4">
     <PageHeader title="To'plamlar" create-label="Yangi to'plam" v-model:search="search" @create="openCreate">
       <template #filters>
-        <Select v-model="categoryFilter">
-          <SelectTrigger class="w-48">
-            <SelectValue placeholder="Kategoriya" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Barcha kategoriyalar</SelectItem>
-            <SelectItem v-for="cat in categories" :key="cat.id" :value="cat.id">
-              {{ cat.name.uz }}
-            </SelectItem>
-          </SelectContent>
-        </Select>
+        <SearchableSelect
+          v-model="categoryFilter"
+          :options="categories.map(c => ({ value: c.id, label: c.name.uz }))"
+          placeholder="Kategoriya"
+          all-label="Barcha kategoriyalar"
+        />
       </template>
     </PageHeader>
 
-    <DataTable :data="collections" :loading="loading" @edit="openEdit" @delete="openDelete" @toggle-public="handleTogglePublic" />
+    <DataTable :data="collections" :loading="loading" :page="currentPage" :page-size="Number(pageSize)" @edit="openEdit" @delete="openDelete" @toggle-public="handleTogglePublic" @toggle-new="handleToggleNew" @generate-audio="handleOpenAudioModal" />
     <CursorPagination :meta="meta" :loading="loading" v-model:page-size="pageSize" @change="goToPage" />
     <CollectionForm :open="formOpen" :collection="editingCollection" :loading="formLoading" @update:open="formOpen = $event" @submit="handleSubmit" />
     <DeleteDialog v-model:open="deleteOpen" :loading="deleteLoading" @confirm="handleDelete" />
+    <AudioModal v-model:open="audioModalOpen" :collection-id="audioCollectionId" :collection-name="audioCollectionName" />
   </div>
 </template>
